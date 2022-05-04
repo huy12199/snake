@@ -12,9 +12,9 @@ class Xy {
 class Snake {
     constructor() {
         this.body = [
-            new Xy(100, 5),
-            new Xy(120, 5),
-            new Xy(140, 5)
+            new Xy(100, 20),
+            new Xy(120, 20),
+            new Xy(140, 20)
         ]
 
         this.speed = new Xy(-1, 0)
@@ -39,10 +39,28 @@ class Snake {
         }
     }
 
+    headGame() {
+        let head = this.body[0]
+        if (head.x < 0) {
+            head.x = 600;
+        }
+        if (head.x > 600) {
+            head.x = 0
+        }
+        if (head.y < 0) {
+            head.y = 600;
+        }
+        if (head.y > 600) {
+            head.y = 0
+        }
+
+    }
+
 
 // làm cho con rắn chuyển động
     move() {
         this.clearSnake()
+        this.headGame()
         for (let i = this.body.length - 1; i > 0; i--) {
             this.body[i].x = this.body[i - 1].x
             this.body[i].y = this.body[i - 1].y
@@ -53,25 +71,18 @@ class Snake {
 
     }
 
+
 //check xem tọa độ phần đầu rắn và tọa độ hộp == nhau ko
 //    đk đang ko nhận check phần này
     check(food) {
         let head = this.body[0]
-        if (food.y === head.y) {
-            console.log("y")
-        }
-        if (food.x === head.x) {
-            console.log("x")
-        }
-
-        console.log(head.y + "head")
-        console.log(food.y + "food")
+        return food.x === head.x && food.y === head.y
     }
 
 
     grow() {
-        this.clearSnake()
 
+        this.clearSnake()
         let snakeLength = this.body.length
         console.log(snakeLength)
         let snakeX = this.body[snakeLength - 1].x - this.body[snakeLength - 2].x
@@ -82,6 +93,23 @@ class Snake {
         )
         this.body.push(toado)
         this.draw()
+    }
+
+    checkover() {
+        let tail = this.body;
+        let snakeLength = this.body.length;
+        console.log(tail[0].x + "hmmm")
+        for (let i = 1; i < snakeLength - 1; i++) {
+            if (tail[0].x === tail[i].x && tail[0].y === tail[i].y) {
+                this.clearSnake()
+                this.body = [
+                    new Xy(100, 20),
+                    new Xy(120, 20),
+                    new Xy(140, 20)
+                ]
+                this.draw()
+            }
+        }
     }
 
 
@@ -100,8 +128,7 @@ class Food {
     }
 
     randomNumber() {
-        let randomNumber = Math.floor(Math.random() * 500) + 1;
-        randomNumber -= randomNumber % 20
+        let randomNumber = Math.floor(Math.random() * 600) + 1;
         return randomNumber
     }
 
@@ -114,18 +141,29 @@ class Food {
         this.cleasfood()
         this.x = this.randomNumber()
         this.y = this.randomNumber()
+        this.x = Math.floor(this.x / 20) * 20;
+        this.y = Math.floor(this.y / 20) * 20;
         this.draw()
     }
 
 }
 
-setInterval(() => {
-    snake.move()
-    if (snake.check(food) === true) {
-        snake.grow()
-        food.spawn()
-    }
-}, 200)
+let activity = ``;
+
+function start() {
+    activity = setInterval(() => {
+        snake.move()
+        if (snake.check(food)) {
+            snake.grow()
+            food.spawn()
+        }
+        snake.checkover()
+    }, 200)
+}
+
+function stop() {
+    clearInterval(activity)
+}
 
 
 //điều khiển rắn từ các phím
